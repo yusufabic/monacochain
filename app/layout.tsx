@@ -1,13 +1,16 @@
 import { Main } from "next/document";
 import "./globals.css";
 import MainHeader from "@/components/main-header/main-header";
+import Footer from "@/components/footer";
 
 export const metadata = {
   title: "Monaco Chain",
   description: "Luxury chain website",
 };
 
-export default function RootLayout({ children }) {
+import { ReactNode } from "react";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -18,10 +21,8 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <MainHeader />
-        <main>{children}</main>
-        <footer className="bg-gray-100 text-black p-4 text-center">
-          © 2025 Monaco Chain. All rights reserved.
-        </footer>
+        <main className="mt-[164px]">{children}</main>
+        <Footer />
       </body>
     </html>
   );

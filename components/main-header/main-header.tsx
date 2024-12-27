@@ -1,14 +1,30 @@
 "use client";
 import { Menu } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const MainHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showLogo, setShowLogo] = useState(true); // Logo görünürlüğünü kontrol etmek için state
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 10);
+      setShowLogo(scrollY <= 100); // Scroll 100px'den fazlaysa logo kaybolur
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
   const navLinks = [
     { name: "HOME", href: "/" },
     { name: "ABOUT US", href: "/pages/about-us" },
@@ -20,34 +36,38 @@ const MainHeader = () => {
   ];
 
   return (
-    <header className="relative w-full h-[800px]">
-      {/* Background Image */}
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition duration-300 ${
+        isScrolled ? "bg-white/80 backdrop-blur-md shadow-md" : "bg-transparent"
+      }`}
+    >
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url(/navigation.png)",
-        }}
-      ></div>
-
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
-
-      {/* Logo ve Navbar */}
-      <div className="relative z-10 flex flex-col items-center justify-start text-white bg-slate-950 opacity-60 shadow-xl">
+        className={`flex flex-col items-center justify-start transition-all duration-500 ${
+          isScrolled ? "py-2" : "py-6"
+        }`}
+      >
         {/* Hamburger Menu */}
-        <div className="md:hidden flex items-center justify-end mt-4 mr-4 w-full">
-          <button onClick={toggleMenu} className="text-white text-2xl">
+        <div className="md:hidden flex items-start justify-end mr-4 w-full">
+          <button onClick={toggleMenu} className="text-black text-2xl">
             <Menu />
           </button>
         </div>
         {/* Logo */}
-        <h1 className="text-5xl font-bold font-serif tracking-widest mt-20">
-          MONACO CHAIN™
-        </h1>
-        <p className="text-sm mt-1 font-serif">by SOZER</p>
+        {showLogo && (
+          <div
+            className={`text-center transition-opacity duration-500 ${
+              isScrolled ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            <h1 className="text-5xl font-bold font-serif tracking-widest">
+              MONACO CHAIN™
+            </h1>
+            <p className="text-sm font-serif">by SOZER</p>
+          </div>
+        )}
 
         {/* Desktop Navbar */}
-        <nav className="hidden md:block mt-6">
+        <nav className="hidden md:block mt-4">
           <ul className="flex space-x-8 text-lg font-serif tracking-widest">
             {navLinks.map((link, index) => (
               <li key={index}>
@@ -63,8 +83,7 @@ const MainHeader = () => {
       {/* Hamburger Menu Drawer */}
       {menuOpen && (
         <div className="fixed inset-0 bg-white text-black z-20">
-          <div className="flex justify-end items-center p-4 border-b">
-            {/* Menü Kapatma Butonu */}
+          <div className="flex justify-end items-center bg-white p-4 border-b">
             <button
               onClick={toggleMenu}
               className="text-2xl font-bold text-gray-800"
@@ -72,7 +91,7 @@ const MainHeader = () => {
               ×
             </button>
           </div>
-          <ul className="flex flex-col items-start p-4 space-y-4">
+          <ul className="flex flex-col items-start p-4 bg-white space-y-4">
             {navLinks.map((link, index) => (
               <li key={index}>
                 <Link
